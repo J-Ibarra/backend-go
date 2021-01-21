@@ -10,9 +10,10 @@ func loginHandler(c *gin.Context) {
 	payload := loginPayload{}
 	c.BindJSON(&payload)
 
-	response := map[string]interface{}{
-		"username": payload.Username,
-		"password": payload.Password,
+	jwt := generateJwt(payload.Username)
+
+	response := loginResponse{
+		Token: jwt,
 	}
 
 	c.JSON(http.StatusOK, response)
