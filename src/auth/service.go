@@ -12,9 +12,11 @@ var (
 )
 
 func generateJwt(userID string) string {
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"id":  userID,
-		"nbf": time.Now().Unix(),
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &DecodeToken{
+		jwt.StandardClaims{
+			Id:        userID,
+			NotBefore: time.Now().Unix(),
+		},
 	})
 
 	tokenString, err := token.SignedString(hmacSampleSecret)
@@ -23,21 +25,20 @@ func generateJwt(userID string) string {
 		println(err.Error())
 	}
 
-	claims, err := verifyJwt(tokenString)
-	fmt.Printf("%v, %v\n", claims, err)
-
 	return tokenString
 }
 
-func verifyJwt(tokenString string) (interface{}, error) {
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+// VerifyJwt func
+func VerifyJwt(tokenString string, decodeToken *DecodeToken) error {
+	token, err := jwt.ParseWithClaims(tokenString, decodeToken, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
 		return hmacSampleSecret, nil
 	})
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return token.Claims.(jwt.MapClaims), nil
+	decodeToken = token.Claims.(*DecodeToken)
+	return decodeToken.Valid()
 }
