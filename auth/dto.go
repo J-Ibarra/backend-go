@@ -7,6 +7,11 @@ type loginPayload struct {
 	Password string `json:"password"`
 }
 
+type registerPayload struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
 type loginResponse struct {
 	Token string `json:"token"`
 }

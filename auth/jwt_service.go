@@ -42,14 +42,9 @@ func init() {
 		signingMethod = jwt.SigningMethodRS256
 		isRS256 = true
 	}
-
-	if publicKey != nil && privateKey != nil {
-		signingMethod = jwt.SigningMethodRS256
-		isRS256 = true
-	}
 }
 
-func generateJwt(userID string) string {
+func generateJwt(userID string) (string, error) {
 	token := jwt.NewWithClaims(signingMethod, &DecodeToken{
 		jwt.StandardClaims{
 			Id:        userID,
@@ -57,12 +52,19 @@ func generateJwt(userID string) string {
 		},
 	})
 	var tokenString string
+	var err error
+
 	if isRS256 {
-		tokenString, _ = token.SignedString(privateKey)
+		tokenString, err = token.SignedString(privateKey)
 	} else {
-		tokenString, _ = token.SignedString(hmacSecret)
+		tokenString, err = token.SignedString(hmacSecret)
 	}
-	return tokenString
+
+	if err != nil {
+		return "", err
+	}
+
+	return tokenString, nil
 }
 
 // VerifyJwt func

@@ -11,6 +11,7 @@ func ConfigureRoutes(router *gin.Engine) {
 	auth := router.Group("/api/v1/auth")
 
 	auth.POST("/sign-in", loginHandler)
+	auth.POST("/sign-up", registerHandler)
 
 	secureGroup := auth.Group("")
 	secureGroup.Use(authMiddleware())
