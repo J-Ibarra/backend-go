@@ -10,4 +10,5 @@ replace (
 require (
 	auth v0.0.0
 	github.com/gin-gonic/gin v1.6.3
+	util v0.0.0
 )

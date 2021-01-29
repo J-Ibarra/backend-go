@@ -2,6 +2,7 @@ package main
 
 import (
 	"auth"
+	"util"
 
 	"github.com/gin-gonic/gin"
 )
@@ -17,6 +18,8 @@ func runServer(router *gin.Engine) {
 func main() {
 	r := gin.Default()
 	defer runServer(r)
+
+	r.Use(util.HandlerError())
 
 	auth.ConfigureRoutes(r)
 }

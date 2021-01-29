@@ -3,6 +3,8 @@ package auth
 import (
 	"net/http"
 
+	"util"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -13,30 +15,21 @@ func loginHandler(c *gin.Context) {
 	user, err := FindUser(payload.Username)
 
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-			"message": "invalid credentials",
-			"error":   err.Error(),
-		})
+		c.Error(util.CreateAPIError(http.StatusUnauthorized, err.Error()))
 		return
 	}
 
 	err = ConfirmPassword(user, payload.Password)
 
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-			"message": "invalid credentials",
-			"error":   err.Error(),
-		})
+		c.Error(util.CreateAPIError(http.StatusUnauthorized, "invalid credentials", err.Error()))
 		return
 	}
 
 	jwt, err := generateJwt(user.Username)
 
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"message": "could not generate token",
-			"error":   err.Error(),
-		})
+		c.Error(util.CreateAPIError(http.StatusUnauthorized, "could not generate token", err.Error()))
 		return
 	}
 
@@ -54,10 +47,7 @@ func registerHandler(c *gin.Context) {
 	_, err := FindUser(payload.Username)
 
 	if err == nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"message": "username has been take",
-			"error":   "can not create user",
-		})
+		c.Error(util.CreateAPIError(http.StatusUnauthorized, "username has been take", "can not create user"))
 		return
 	}
 
@@ -78,10 +68,7 @@ func registerHandler(c *gin.Context) {
 func getUserHandler(c *gin.Context) {
 	user, err := FindUser(c.GetString("UserID"))
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"message": "could not find user",
-			"error":   err.Error(),
-		})
+		c.Error(util.CreateAPIError(http.StatusUnauthorized, "could not find user", err.Error()))
 		return
 	}
 
