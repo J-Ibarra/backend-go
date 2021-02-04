@@ -2,6 +2,7 @@ package auth
 
 import (
 	"crypto/rsa"
+	"fmt"
 	"time"
 
 	"util"
@@ -44,10 +45,10 @@ func init() {
 	}
 }
 
-func generateJwt(userID string) (string, error) {
+func generateJwt(userID uint) (string, error) {
 	token := jwt.NewWithClaims(signingMethod, &DecodeToken{
 		jwt.StandardClaims{
-			Id:        userID,
+			Id:        fmt.Sprint(userID),
 			NotBefore: time.Now().Unix(),
 		},
 	})

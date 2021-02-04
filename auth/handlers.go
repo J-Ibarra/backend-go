@@ -26,7 +26,7 @@ func loginHandler(c *gin.Context) {
 		return
 	}
 
-	jwt, err := generateJwt(user.Username)
+	jwt, err := generateJwt(user.ID)
 
 	if err != nil {
 		c.Error(util.CreateAPIError(http.StatusUnauthorized, "could not generate token", err.Error()))
@@ -56,7 +56,11 @@ func registerHandler(c *gin.Context) {
 		Password: payload.Password,
 	}
 
-	CreateUser(user)
+	err = CreateUser(&user)
+	if err != nil {
+		c.Error(util.CreateAPIError(http.StatusUnauthorized, err.Error(), "can not create user"))
+		return
+	}
 
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "user create successfully",
@@ -66,7 +70,8 @@ func registerHandler(c *gin.Context) {
 }
 
 func getUserHandler(c *gin.Context) {
-	user, err := FindUser(c.GetString("UserID"))
+	userID := c.GetString("UserID")
+	user, err := FindUserByID(userID)
 	if err != nil {
 		c.Error(util.CreateAPIError(http.StatusUnauthorized, "could not find user", err.Error()))
 		return

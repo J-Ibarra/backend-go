@@ -7,4 +7,6 @@ require (
 	github.com/gin-gonic/gin v1.6.3
 	github.com/stretchr/testify v1.7.0 // indirect
 	github.com/subosito/gotenv v1.2.0
+	gorm.io/driver/sqlite v1.1.4
+	gorm.io/gorm v1.20.12
 )
